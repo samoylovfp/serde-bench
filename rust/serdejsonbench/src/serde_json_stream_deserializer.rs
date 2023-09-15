@@ -9,25 +9,25 @@ use std::{fmt, thread};
 
 use crate::Json;
 
-type DeserializeResult = Result<Json, String>;
+type DeserializeResult<'d> = Result<Json<'d>, String>;
 
-pub struct JsonIterator {
-    receiver: Receiver<DeserializeResult>,
+pub struct JsonIterator<'d> {
+    receiver: Receiver<DeserializeResult<'d>>,
 }
 
-struct JsonVisitor {
-    sender: SyncSender<DeserializeResult>,
+struct JsonVisitor<'d> {
+    sender: SyncSender<DeserializeResult<'d>>,
 }
 
-impl Iterator for JsonIterator {
-    type Item = DeserializeResult;
+impl<'d> Iterator for JsonIterator<'d> {
+    type Item = DeserializeResult<'d>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.receiver.recv().ok() //ok() because a RecvError implies we are done
     }
 }
 
-impl JsonIterator {
+impl JsonIterator<'static> {
     pub fn new(path: PathBuf) -> Self {
         let (sender, receiver) = sync_channel::<DeserializeResult>(0);
 
@@ -45,7 +45,7 @@ impl JsonIterator {
     }
 }
 
-impl<'de> Visitor<'de> for JsonVisitor {
+impl<'de> Visitor<'de> for JsonVisitor<'de> {
     type Value = ();
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
