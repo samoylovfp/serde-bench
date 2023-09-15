@@ -32,12 +32,13 @@ impl JsonIterator {
         let (sender, receiver) = sync_channel::<DeserializeResult>(0);
 
         thread::spawn(move || {
-            let reader = BufReader::with_capacity(8192, File::open(path).unwrap()); //in real scenario may want to send error, instead of unwrapping
-            let mut deserializer = serde_json::Deserializer::from_reader(reader);
-            if let Err(e) = deserializer.deserialize_seq(JsonVisitor {
+            let mut data: Vec<u8> = std::fs::read_to_string(path).unwrap().bytes().collect();
+            let mut deserializer = simd_json::Deserializer::from_slice(&mut data).unwrap();
+            let result = deserializer.deserialize_seq(JsonVisitor {
                 sender: sender.clone(),
-            }) {
-                let _ = sender.send(Err(e.to_string())); //let _ = because error from calling send just means receiver has disconnected
+            });
+            if let Err(e) = result {
+                _ = sender.send(Err(e.to_string()));
             }
         });
 
