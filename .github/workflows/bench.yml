@@ -18,13 +18,13 @@ jobs:
     - name: setup-files
       run: ./uncompress.sh
 
+    - name: rust/benchmark
+      run: cd rust/serdejsonbench && cargo build -r --examples && ./target/release/examples/bench --console --times 10
+
     - uses: actions/setup-dotnet@v3
       with:
         dotnet-version: '8.0.x'
     - run: cd dotnet/jsonbench && dotnet run -c Release -- --console --times 10
-
-    - name: rust/benchmark
-      run: cd rust/serdejsonbench && cargo build -r --examples && ./target/release/examples/bench --console --times 10
     
     - uses: actions/setup-java@v3
       with:
