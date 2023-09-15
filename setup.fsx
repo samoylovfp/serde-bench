@@ -3,6 +3,7 @@ type [<Measure>] MB
 type [<Measure>] KB
 
 let generateJsonArray data times path = 
+    printfn "creating %i times json array" times
     use f = System.IO.File.OpenWrite(path)
 
     f.WriteByte('['B)
@@ -14,6 +15,7 @@ let generateJsonArray data times path =
     f.WriteByte(']'B)
 
 let generateNdjson data times path = 
+    printfn "creating %i times ndjson" times
     use f = System.IO.File.OpenWrite(path)
 
     for i in 1L .. times do

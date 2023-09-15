@@ -1,0 +1,39 @@
+name: build-java
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
+    paths:
+        - '.github/**-java.yml'
+        - 'java/**'
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: setup-files
+      run: ./uncompress.sh
+
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+    - run: cd dotnet/jsonbench && dotnet run -c Release -- --console --times 10
+
+    - name: rust/benchmark
+      run: cd rust/serdejsonbench && cargo build -r --examples && ./target/release/examples/bench --console --times 10
+    
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+        cache: 'maven'
+
+    - name: java/gson benchmark
+      run: cd java/benchmark-gson && mvn clean package -DskipTests && java -cp ./target/uber-benchmark-gson-0.0.1-SNAPSHOT.jar com.jsonbench.Main --console --times 10
+    
+    - name: java/jackson benchmark
+      run: cd java/benchmark-jackson && mvn clean package -DskipTests && java -cp ./target/uber-benchmark-jackson-0.0.1-SNAPSHOT.jar com.jsonbench.Main --console --times 10

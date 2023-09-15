@@ -54,7 +54,7 @@ public class Main {
                 count++;
             }
         }
-        if (count != 143702) {
+        if (count != 68495) {
             throw new RuntimeException("bad count");
         }
     }

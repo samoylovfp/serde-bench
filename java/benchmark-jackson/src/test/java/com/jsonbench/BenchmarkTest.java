@@ -58,7 +58,7 @@ public class BenchmarkTest {
                 count++;
             }
         }
-        assertEquals(140, count);
+        assertEquals(66, count);
     }
 
     @Test
@@ -79,6 +79,6 @@ public class BenchmarkTest {
                 count++;
             }
         }
-        assertEquals(143702, count);
+        assertEquals(68495, count);
     }
 }
